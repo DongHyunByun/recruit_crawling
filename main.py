@@ -17,9 +17,9 @@ if __name__ == "__main__":
     }
 
     # 크롤링할 폴더 지정
-    if not os.path.exists(d):
-        os.makedirs(d)
-    folder = d
+    folder = "crawling_data/"+d
+    if not os.path.exists(folder):
+        os.makedirs(folder)
 
     # 크롤링 시작
     crawler = Crawling(**params)
@@ -30,7 +30,6 @@ if __name__ == "__main__":
     crawler.save_crawling(os.path.join(folder,crawling_file_name))
 
     # 첨부파일 데이터
-
     down_folder = d # 첨부파일 저장할 폴더이름
     download_file_name = "첨부파일_"+d+".xlsx" # 첨부파일 내역 엑셀파일
     crawler.save_download(os.path.join(folder,down_folder), os.path.join(folder,download_file_name))
