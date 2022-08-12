@@ -1,5 +1,7 @@
 from crawling import Crawling
 from datetime import datetime
+from hwp_to_pdf import hwp2pdf
+
 import os
 import argparse
 
@@ -34,3 +36,5 @@ if __name__ == "__main__":
     download_file_name = "첨부파일_"+d+".xlsx" # 첨부파일 내역 엑셀파일
     crawler.save_download(os.path.join(folder,down_folder), os.path.join(folder,download_file_name))
 
+    # hwp파일을 pdf로
+    hwp2pdf(d)

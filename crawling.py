@@ -164,7 +164,7 @@ class Crawling:
         elif t== "기관명":
             row["담당부서명"] = self.replace_text(elmt.td.text)
         elif t=="본문":
-            row["서비스 내용"] = self.replace_text(elmt.textarea.text)
+            row["서비스 내용"] = self.replace_text(elmt.textarea.text)[:2000]
         elif t=="등록일": # 등록일,마감일
             from_d,to_d = (elmt.find_all("td")[0].text, elmt.find_all("td")[1].text)
 
@@ -230,7 +230,7 @@ class Crawling:
                 total_dict[col].append(down_dict.get(col, None))
 
                 if col=="첨부_URL":
-                    request.urlretrieve(down_dict[col], down_folder+"/"+down_dict["파일명"])
+                    request.urlretrieve(down_dict[col], down_folder+"/"+down_dict["SEQ"]+"."+down_dict["파일명"].split(".")[-1])
 
         df = pd.DataFrame(total_dict)
         df.to_excel(down_path,index=False)
