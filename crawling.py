@@ -16,18 +16,20 @@ class Crawling:
     crawling_list_down = []
 
     from_date_str = datetime.today().strftime("%Y%m%d")
+    to_date_str = "99999999"
 
     def __init__(self,main_url,post_url_first,down_url_first):
         self.main_url = main_url
         self.post_url_first = post_url_first
         self.down_url_first = down_url_first
 
-    def crawling(self,from_date_str=from_date_str):
+    def crawling(self,from_date_str=from_date_str, to_date_str=to_date_str):
         '''
         :param from_date_str: 시작할 날짜
         :return:
         '''
-        self.from_date_str=from_date_str
+        self.from_date_str = from_date_str
+        self.to_date_str = to_date_str
 
         page_number=1
         while(1):
@@ -63,6 +65,8 @@ class Crawling:
                     "키워드" : "",
                     "입력일자" : "",
                     "등록여부" : "N",
+                    "마감일":"",
+                    "근무지역":"",
                 }
 
                 row_down = {
@@ -95,8 +99,8 @@ class Crawling:
                     if self.get_info(row,row_down,row_down_list,title,info):
                         return
 
-                # 경기도 인것만
-                if "경기" in row["담당부서명"]:
+                # 경기도, 마감일이 to_date_str이전인 것만
+                if ("경기" in row["담당부서명"]) or ("경기" in row["근무지역"]) and (row["마감일"]<=to_date_str) :
                     print(row)
                     self.crawling_list.append(row)
                     print(row_down_list)
@@ -165,17 +169,20 @@ class Crawling:
             row["담당부서명"] = self.replace_text(elmt.td.text)
         elif t=="본문":
             row["서비스 내용"] = self.replace_text(elmt.textarea.text)[:2000]
+        elif t=="근무지역":
+            row["근무지역"] = self.replace_text(elmt.td.text)
         elif t=="등록일": # 등록일,마감일
             from_d,to_d = (elmt.find_all("td")[0].text, elmt.find_all("td")[1].text)
 
             from_d_str = "".join(from_d.split("-"))
-            # to_d_str = "".join(to_d.split("-")) #마감일자
+            to_d_str = "".join(to_d.split("-")) #마감일자
 
             if from_d_str < self.from_date_str:  # from_date 이전에 등록된 게시물이 있으면 종료
                 return True
             else:
                 row["시군구_년월일"] = "99_"+from_d_str
                 row["등록 일자"] = from_d_str
+                row["마감일"] = to_d_str
 
         elif t=="첨부파일":
             down_list = elmt.find_all('a')
@@ -197,6 +204,7 @@ class Crawling:
                 row_down_temp["경로"] = "FILE서버 기준경로\기준일자\\"+row_down_temp["SEQ"]
 
                 row_down_list.append(row_down_temp)
+
 
     def save_crawling(self,path):
         '''

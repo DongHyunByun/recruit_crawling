@@ -9,9 +9,12 @@ if __name__ == "__main__":
     args = argparse.ArgumentParser()
     args.add_argument("--d", type=str, default=datetime.today().strftime("%Y%m%d"),
                       help="크롤링을 시작할 날짜, 디폴트는 오늘, 폴더명이기도 함")
+    args.add_argument("--to_d", type=str, default="99999999",
+                      help="마감일이 to_d포함 이전인 것만 크롤링 한다.")
     config = args.parse_args()
 
     d = config.d
+    to_d = config.to_d
     params = {
         "main_url": "https://www.gojobs.go.kr/apmList.do?menuNo=401&mngrMenuYn=N&selMenuNo=400&upperMenuNo=&wd=1920", # 게시글 목록 url
         "post_url_first": "https://www.gojobs.go.kr/apmView.do", # 게시글 url 앞부분
@@ -25,7 +28,7 @@ if __name__ == "__main__":
 
     # 크롤링 시작
     crawler = Crawling(**params)
-    crawler.crawling(d)
+    crawler.crawling(d,to_d)
 
     # 게시글 데이터
     crawling_file_name = "게시글_"+d+".xlsx" # 게시글 데이터 엑셀파일
