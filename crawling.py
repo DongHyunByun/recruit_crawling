@@ -1,9 +1,11 @@
 import requests
 from bs4 import BeautifulSoup as bs
 from datetime import datetime
+import time
 import pandas as pd
 from urllib import request,parse
 import os
+import sys
 
 class Crawling:
     # url call 함수 파라미터명
@@ -35,7 +37,7 @@ class Crawling:
         while(1):
             # 목록 페이지 get
             now_page_url = self.main_url+"&pageIndex="+str(page_number)
-            page = requests.get(now_page_url)  # get요청 후 응답 수신
+            page = self.try_request(now_page_url)  # get요청 후 응답 수신
             soup = bs(page.text, "html.parser")
 
             # 끝페이지이면 종료
@@ -82,7 +84,7 @@ class Crawling:
                 row_down_list = []
 
                 # 게시글 페이지 get
-                post_page = requests.get(post_url)
+                post_page = self.try_request(post_url)
                 post_soup = bs(post_page.text, "html.parser")
                 info_list = post_soup.find("table",{"id":"apmViewTbl"}).findChildren("tr",recursive=False)
 
@@ -100,7 +102,7 @@ class Crawling:
                         return
 
                 # 경기도, 마감일이 to_date_str이전인 것만
-                if ("경기" in row["담당부서명"]) or ("경기" in row["근무지역"]) and (row["마감일"]<=to_date_str) :
+                if (("경기" in row["담당부서명"]) or ("경기" in row["근무지역"])) and (row["마감일"]<=to_date_str) :
                     print(row)
                     self.crawling_list.append(row)
                     print(row_down_list)
@@ -205,6 +207,19 @@ class Crawling:
 
                 row_down_list.append(row_down_temp)
 
+    def try_request(self,url):
+        '''
+        request를 수행한다. 실패시 30초 대기 후 다시 시도한다. 총 3회 시도한다
+        '''
+        for i in range(3):
+            try:
+                post_page = requests.get(url)
+                return post_page
+            except:
+                print("except!")
+                if i == 2:
+                    sys.exit("3회 시도 실패로 강제종료")
+                time.sleep(30)
 
     def save_crawling(self,path):
         '''
