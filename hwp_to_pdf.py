@@ -1,11 +1,9 @@
 import os
-# import win32com.client as win32
-# import win32gui
+import win32com.client as win32
+import win32gui
 
 # 함수
-def hwp2pdf(d):
-    BASE_DIR = "C:/Users/admin/PycharmProjects/pythonProject/crawling_data/"+d+"/"+d
-
+def hwp2pdf(BASE_DIR):
     hwp = win32.gencache.EnsureDispatch("HWPFrame.HwpObject")  # hwp 창열기
     win32gui.FindWindow(None, 'Noname 1 - HWP')
     hwp.RegisterModule('FilePathCheckDLL', 'SecurityModule')  # 보안모듈 삭제

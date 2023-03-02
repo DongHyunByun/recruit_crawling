@@ -5,3 +5,7 @@
 /lib
 
 pyvenv.cfg
+
+/__pycache__
+
+/crawling_data/*

@@ -6,7 +6,6 @@ import pandas as pd
 from urllib import request,parse
 import os
 import sys
-import openpyxl
 
 class Crawling:
     # url call 함수 파라미터명
@@ -51,6 +50,10 @@ class Crawling:
             for pst in posts:
                 # 게시글 url get
                 post_values = self.get_value(pst.a["href"])
+
+                if not post_values:
+                    continue
+
                 post_url = self.get_url(self.post_url_first,self.post_keys,post_values)
 
                 row = {
@@ -116,17 +119,20 @@ class Crawling:
         '''
         게시글의 url을 가져오기위해 필요한 value를 반환한다
         '''
-        start_index = href.index("(")
+        try:
+            start_index = href.index("(")
 
-        L = href[start_index + 1:-1].split("',")
-        size = len(L)
-        for i in range(size):
-            if i==size-1:
-                L[i]=L[i].strip()[1:-1]
-            else:
-                L[i]=L[i].strip()[1:]
+            L = href[start_index + 1:-1].split("',")
+            size = len(L)
+            for i in range(size):
+                if i==size-1:
+                    L[i]=L[i].strip()[1:-1]
+                else:
+                    L[i]=L[i].strip()[1:]
 
-        return L
+            return L
+        except:
+            return
 
     def get_url(self,url_first,url_keys,url_values):
         '''
@@ -196,6 +202,8 @@ class Crawling:
 
                 href = elmt.find_all("a")[i]["href"]
                 down_values = self.get_value(href)
+                if not down_values:
+                    continue
 
                 file_name = down_values[0]
                 url = self.get_url(self.down_url_first, self.down_keys, down_values)
